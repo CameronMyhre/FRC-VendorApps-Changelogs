@@ -1,0 +1,67 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Vendor App Changelogs</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <script>
+        function submitForm() {
+        document.getElementById("changelogForm").submit();
+        }
+        // Fade in the content area after page load so switching logs isn’t jarring.
+        document.addEventListener("DOMContentLoaded", function(){
+        const content = document.querySelector('.content');
+        setTimeout(() => {
+            content.style.transition = 'opacity 0.5s';
+            content.style.opacity = 1;
+        }, 50);
+        });
+  </script>
+  </head>
+  <body>
+  <!-- Header / Nav -->
+  <header>
+    <div class="logo">Vendor App Changelogs</div>
+    <nav>
+      <ul>
+      </ul>
+    </nav>
+  </header>
+
+  <!-- Main Area: Sidebar and Content -->
+  <main>
+    <!-- Sidebar: Vendor Selection -->
+    <aside class="sidebar">
+      <form id="changelogForm" method="GET" action="/">
+        <% @vendors.each do |vendor| %>
+          <div class="vendor-section">
+            <h2><%= vendor %></h2>
+            <select name="<%= vendor %>" onchange="submitForm()">
+              <option value="">Select a release version</option>
+              <% @vendor_data[vendor][:releases].each do |release| %>
+                <option value="<%= release[:version] %>" 
+                  <%= "selected" if @vendor_data[vendor][:selected] && @vendor_data[vendor][:selected][:version] == release[:version] %>>
+                  <%= release[:version] %>
+                </option>
+              <% end %>
+            </select>
+          </div>
+        <% end %>
+        <!-- In case auto-submit is disabled -->
+        <input type="submit" class="submit-btn" value="Show Changelogs">
+      </form>
+    </aside>
+   <!-- Main Content: Changelogs -->
+    <section class="content">
+      <% @vendors.each do |vendor| %>
+        <% if @vendor_data[vendor][:selected] %>
+          <div class="changelog-card">
+            <h2><%= vendor %> Changelog for <%= @vendor_data[vendor][:selected][:version] %></h2>
+            <pre><%= @vendor_data[vendor][:selected][:body] %></pre>
+          </div>
+        <% end %>
+      <% end %>
+    </section>
+  </main>
+</body>
+</html>
